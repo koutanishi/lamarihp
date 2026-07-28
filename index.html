@@ -3,956 +3,1008 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LAMARI — 価値は、照らされて伝わる。</title>
+<title>失点分析ボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #fafaf8;
-  --ink: #15191e;
-  --navy: #1c2b3f;
-  --navy-soft: #2e4259;
-  --line: rgba(21,25,30,0.1);
-  --line-strong: rgba(21,25,30,0.18);
-  --gray: #6b6f74;
-  --panel: #f1efe9;
-}
+  :root{
+    --bg:#12161A;
+    --surface:#1B2126;
+    --surface-2:#20272D;
+    --line:#2C343B;
+    --text:#F1EEE6;
+    --text-dim:#9AA3AA;
+    --text-faint:#5E666D;
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+    --c-teichi:#6FBF73;
+    --c-pp:#E8B23D;
+    --c-ppg:#4FAF9E;
+    --c-counter:#3DA5D9;
+    --c-setplay:#A78BE0;
+    --c-pk:#DD5C55;
+    --c-other:#8A9199;
 
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Noto Sans JP', sans-serif;
-  font-weight: 300;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
+    --c-special:#E8B23D;
+    --c-normal:#5B717D;
 
-/* ─── NAV ─── */
-nav {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 200;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22px 56px;
-  background: rgba(250,250,248,0.9);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--line);
-}
-.nav-logo img { height: 32px; width: auto; display: block; object-fit: contain; }
-.nav-logo-fallback {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  color: var(--ink);
-}
-.nav-btn {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--ink);
-  border: 1px solid var(--line-strong);
-  padding: 10px 22px;
-  text-decoration: none;
-  transition: all 0.25s ease;
-}
-.nav-btn:hover { background: var(--navy); color: var(--bg); border-color: var(--navy); }
+    --c-accent:#E5484D;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Noto Sans JP',sans-serif;
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 0;}
 
-/* ─── HERO ─── */
-.hero {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 56px;
-  border-bottom: 1px solid var(--line);
-  position: relative;
-}
-.hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
-.hero-tag {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: var(--gray);
-  margin-bottom: 32px;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.15s cubic-bezier(.16,1,.3,1) forwards;
-}
-.hero-heading {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: clamp(40px, 6.2vw, 80px);
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.3s cubic-bezier(.16,1,.3,1) forwards;
-}
-.hero-heading .accent { color: var(--navy); }
-.hero-rule {
-  width: 1px;
-  height: 56px;
-  background: var(--line-strong);
-  margin: 44px 0;
-  opacity: 0;
-  animation: growLine 1s 0.6s forwards;
-}
-@keyframes growLine {
-  from { opacity: 0; height: 0; }
-  to   { opacity: 1; height: 56px; }
-}
-.hero-sub {
-  font-size: 15px;
-  line-height: 2.3;
-  color: var(--gray);
-  max-width: 460px;
-  margin-bottom: 44px;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.75s cubic-bezier(.16,1,.3,1) forwards;
-}
-.hero-sub strong { color: var(--ink); font-weight: 500; }
-.hero-cta-row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.9s cubic-bezier(.16,1,.3,1) forwards;
-}
-.hero-cta-btn {
-  display: inline-block;
-  background: var(--navy);
-  color: var(--bg);
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  padding: 17px 38px;
-  text-decoration: none;
-  transition: background 0.25s;
-}
-.hero-cta-btn:hover { background: var(--ink); }
-.hero-cta-note {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: var(--gray);
-}
+  header{
+    position:relative;
+    border-radius:14px;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 39px, rgba(241,238,230,0.035) 39px 40px),
+      repeating-linear-gradient(90deg, transparent 0 39px, rgba(241,238,230,0.035) 39px 40px),
+      var(--surface);
+    border:1px solid var(--line);
+    padding:24px 26px 20px;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute; right:-40px; top:-40px;
+    width:220px;height:220px;border-radius:50%;
+    border:2px solid rgba(229,72,77,0.18);
+  }
+  .eyebrow{
+    font-family:'Oswald',sans-serif;
+    letter-spacing:0.18em;
+    font-size:12px;
+    color:var(--c-accent);
+    text-transform:uppercase;
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 16px;
+    letter-spacing:0.01em;
+  }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+  .scope-row{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-bottom:16px;
+  }
+  .scope-row label{font-size:11px;color:var(--text-dim);letter-spacing:0.05em;margin-right:2px;}
+  select{
+    background:var(--surface-2);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:13px;
+    font-family:'Noto Sans JP',sans-serif;
+  }
+  .chip-group{display:flex;gap:6px;flex-wrap:wrap;}
 
-/* ─── REALITY (price honesty) ─── */
-.reality {
-  padding: 100px 56px;
-  background: var(--navy);
-  border-bottom: 1px solid var(--line);
-}
-.reality-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: center;
-}
-.reality-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: rgba(250,250,248,0.5);
-  display: block;
-  margin-bottom: 20px;
-}
-.reality-title {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: clamp(24px, 3.2vw, 36px);
-  font-weight: 500;
-  color: var(--bg);
-  line-height: 1.6;
-}
-.reality-title .strike {
-  text-decoration: line-through;
-  text-decoration-color: rgba(250,250,248,0.4);
-  text-decoration-thickness: 1px;
-  color: rgba(250,250,248,0.55);
-}
-.reality-body {
-  font-size: 14px;
-  line-height: 2.3;
-  color: rgba(250,250,248,0.55);
-}
-.reality-body strong { color: var(--bg); font-weight: 500; }
+  .board{
+    display:flex;
+    gap:0;
+    flex-wrap:wrap;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  .cell{
+    flex:1 1 140px;
+    padding:4px 18px;
+    border-right:1px solid var(--line);
+  }
+  .cell:last-child{border-right:none;}
+  .cell .num{
+    font-family:'Oswald',sans-serif;
+    font-size:32px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    color:var(--text);
+  }
+  .cell .num span{font-size:16px;color:var(--text-dim);font-weight:500;margin-left:2px;}
+  .cell .label{font-size:11px;color:var(--text-dim);letter-spacing:0.04em;}
+  .cell.hot .num{color:var(--c-accent);}
 
-/* ─── TICKER ─── */
-.ticker { overflow: hidden; padding: 13px 0; background: var(--ink); }
-.ticker-track { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; }
-.ticker-item {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.28em;
-  color: rgba(250,250,248,0.28);
-  padding: 0 32px;
-  border-right: 1px solid rgba(250,250,248,0.07);
-  flex-shrink: 0;
-}
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  section{margin-top:26px;}
+  .section-title{
+    font-family:'Oswald',sans-serif;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin:0 0 10px;
+  }
+  .section-sub{font-size:12px;color:var(--text-faint);margin:-6px 0 12px;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+  }
 
-/* ─── COMMON SECTION ─── */
-.section-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: var(--gray);
-  display: block;
-  margin-bottom: 18px;
-}
-.section-title {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: clamp(28px, 4vw, 46px);
-  font-weight: 500;
-  line-height: 1.4;
-}
+  /* ---- comparison table ---- */
+  table.compare{width:100%;border-collapse:collapse;font-size:13px;}
+  table.compare th{
+    text-align:left;font-size:11px;color:var(--text-faint);
+    font-weight:500;letter-spacing:0.04em;
+    padding:0 10px 8px;border-bottom:1px solid var(--line);
+  }
+  table.compare th.num, table.compare td.num{text-align:right;}
+  table.compare td{padding:10px 10px;border-bottom:1px solid rgba(44,52,59,0.5);vertical-align:top;}
+  table.compare tr:last-child td{border-bottom:none;}
+  table.compare td.metric{color:var(--text);font-weight:500;}
+  table.compare .rate{font-family:'Oswald',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;color:var(--text);}
+  table.compare .sub{font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;}
 
-/* ─── CONCEPT ─── */
-.concept { padding: 110px 56px; border-bottom: 1px solid var(--line); }
-.concept-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 90px;
-  align-items: start;
-}
-.concept-body {
-  font-size: 14px;
-  line-height: 2.5;
-  color: var(--gray);
-  margin-top: 32px;
-}
-.concept-body strong { color: var(--ink); font-weight: 500; }
-.concept-stats { display: flex; flex-direction: column; }
-.concept-stat {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 26px 0;
-  border-bottom: 1px solid var(--line);
-}
-.concept-stat:first-child { border-top: 1px solid var(--line); }
-.concept-stat-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--gray);
-}
-.concept-stat-val {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 26px;
-  font-weight: 500;
-  color: var(--ink);
-}
+  /* ---- half x situation bars ---- */
+  .halfblock{margin-bottom:20px;}
+  .halfblock:last-child{margin-bottom:0;}
+  .halfblock .htitle{font-size:12px;color:var(--text-dim);margin-bottom:8px;}
+  .barrow{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .barrow:last-child{margin-bottom:0;}
+  .barrow .pname{width:52px;flex:none;font-size:13px;color:var(--text);}
+  .barrow .bartrack{flex:1;height:20px;background:var(--surface-2);border-radius:5px;overflow:hidden;display:flex;}
+  .barrow .seg-normal{background:var(--c-normal);height:100%;}
+  .barrow .seg-special{background:var(--c-special);height:100%;}
+  .barrow .barval{width:150px;flex:none;font-size:11px;color:var(--text-dim);text-align:right;font-variant-numeric:tabular-nums;}
+  .legend-mini{display:flex;gap:16px;font-size:11px;color:var(--text-dim);margin-bottom:14px;}
+  .legend-mini span{display:flex;align-items:center;gap:5px;}
+  .legend-mini i{width:9px;height:9px;border-radius:2px;display:inline-block;}
 
-/* ─── TARGET ─── */
-.target { padding: 110px 56px; background: var(--panel); border-bottom: 1px solid var(--line); }
-.target-inner { max-width: 1100px; margin: 0 auto; }
-.target-title { margin-bottom: 56px; }
-.target-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.target-card { background: var(--bg); padding: 44px 34px; transition: background 0.25s; }
-.target-card:hover { background: var(--bg); box-shadow: inset 0 0 0 1px var(--line-strong); }
-.target-num {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  color: var(--navy);
-  margin-bottom: 22px;
-}
-.target-card-title { font-size: 15px; font-weight: 500; margin-bottom: 14px; line-height: 1.6; }
-.target-card-body { font-size: 13px; line-height: 2; color: var(--gray); }
+  .verdict{
+    margin-top:16px;
+    border-left:2px solid var(--c-accent);
+    padding:4px 0 4px 14px;
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  .verdict b{color:var(--text);font-weight:500;}
 
-/* ─── REASONS ─── */
-.reasons { padding: 110px 56px; border-bottom: 1px solid var(--line); }
-.reasons-inner { max-width: 1100px; margin: 0 auto; }
-.reasons-title { margin-bottom: 56px; }
-.reason-item {
-  display: grid;
-  grid-template-columns: 64px 1fr 1.3fr;
-  gap: 36px;
-  padding: 40px 0;
-  border-top: 1px solid var(--line);
-  align-items: start;
-}
-.reason-item:last-child { border-bottom: 1px solid var(--line); }
-.reason-num { font-family: 'Zen Old Mincho', serif; font-size: 22px; color: var(--navy); }
-.reason-title { font-size: 15px; font-weight: 500; line-height: 1.7; padding-top: 2px; }
-.reason-body { font-size: 13px; line-height: 2.2; color: var(--gray); padding-top: 2px; }
+  /* time band panel */
+  .bands{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .band-cell{
+    background:var(--surface-2);
+    border-radius:10px;
+    padding:14px 14px 12px;
+  }
+  .band-cell .blabel{font-size:11px;color:var(--text-dim);margin-bottom:8px;}
+  .band-cell .bcount{
+    font-family:'Oswald',sans-serif;
+    font-size:26px;font-weight:700;color:var(--text);
+    font-variant-numeric:tabular-nums;
+  }
+  .band-cell .bcount span{font-size:13px;color:var(--text-dim);font-weight:500;}
+  .band-cell .bpct{font-size:12px;color:var(--c-accent);margin-top:2px;font-variant-numeric:tabular-nums;}
+  .band-bar{height:5px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden;}
+  .band-bar-fill{height:100%;background:var(--c-accent);}
 
-/* ─── WORKS ─── */
-.works { padding: 110px 56px; background: var(--panel); border-bottom: 1px solid var(--line); }
-.works-inner { max-width: 1100px; margin: 0 auto; }
-.works-title { margin-bottom: 56px; }
-.works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.work-card {
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  text-decoration: none;
-  color: var(--ink);
-  transition: background 0.25s;
-}
-.work-card:hover { background: #ffffff; }
-.work-top {
-  padding: 36px 32px 28px;
-  border-bottom: 1px solid var(--line);
-  flex: 1;
-}
-.work-sport {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  color: var(--navy);
-  display: block;
-  margin-bottom: 16px;
-}
-.work-name {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 21px;
-  font-weight: 500;
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-.work-team {
-  font-size: 12px;
-  color: var(--gray);
-  line-height: 1.8;
-}
-.work-bottom {
-  padding: 18px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.work-link-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  color: var(--gray);
-}
-.work-arrow {
-  font-family: 'DM Mono', monospace;
-  font-size: 13px;
-  color: var(--navy);
-  transition: transform 0.25s;
-}
-.work-card:hover .work-arrow { transform: translateX(4px); }
+  .catbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;cursor:pointer;user-select:none;}
+  .catbar-row:last-child{margin-bottom:0;}
+  .catbar-row .dot{width:10px;height:10px;border-radius:3px;flex:none;}
+  .catbar-row .name{width:96px;flex:none;font-size:13px;color:var(--text);}
+  .catbar-track{flex:1;height:16px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+  .catbar-fill{height:100%;border-radius:4px;transition:opacity .15s;}
+  .catbar-row .count{width:64px;flex:none;text-align:right;font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;}
+  .catbar-row.off .catbar-fill{opacity:0.15;}
+  .catbar-row.off .name,.catbar-row.off .count{color:var(--text-faint);}
 
-/* ─── PRICE ─── */
-.price { padding: 110px 56px; border-bottom: 1px solid var(--line); }
-.price-inner { max-width: 1100px; margin: 0 auto; }
-.price-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 56px; gap: 24px; flex-wrap: wrap; }
-.price-head-note { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--gray); line-height: 1.9; text-align: right; }
-.price-plans { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--line-strong); border: 1px solid var(--line-strong); }
-.plan { padding: 44px 34px; background: var(--bg); display: flex; flex-direction: column; }
-.plan.center { background: var(--navy); }
-.plan-badge { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--gray); display: block; margin-bottom: 10px; }
-.plan.center .plan-badge { color: rgba(250,250,248,0.5); }
-.plan-name { font-family: 'Zen Old Mincho', serif; font-size: 19px; font-weight: 500; margin-bottom: 24px; line-height: 1.5; }
-.plan.center .plan-name { color: var(--bg); }
-.plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 26px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
-.plan.center .plan-price-row { border-color: rgba(250,250,248,0.12); }
-.plan-yen { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--gray); }
-.plan.center .plan-yen { color: rgba(250,250,248,0.45); }
-.plan-num { font-family: 'Zen Old Mincho', serif; font-size: 40px; font-weight: 500; line-height: 1; }
-.plan.center .plan-num { color: var(--bg); }
-.plan-unit { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--gray); }
-.plan.center .plan-unit { color: rgba(250,250,248,0.45); }
-.plan-list { list-style: none; display: flex; flex-direction: column; gap: 13px; flex: 1; }
-.plan-list li { font-size: 13px; line-height: 1.6; color: var(--gray); display: flex; gap: 10px; align-items: flex-start; }
-.plan.center .plan-list li { color: rgba(250,250,248,0.5); }
-.plan-list li::before { content: '—'; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--navy); flex-shrink: 0; margin-top: 2px; }
-.plan.center .plan-list li::before { color: rgba(250,250,248,0.5); }
-.plan-list li strong { color: var(--ink); font-weight: 500; }
-.plan.center .plan-list li strong { color: var(--bg); }
-.plan-cta {
-  margin-top: 28px;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  color: var(--navy);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.plan.center .plan-cta { color: var(--bg); }
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;}
+  .chip{
+    font-size:12px;
+    padding:6px 12px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--text-dim);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip.active{border-color:var(--c-accent);color:var(--text);background:rgba(229,72,77,0.14);}
+  .searchbox{
+    margin-left:auto;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:12px;
+    color:var(--text);
+    min-width:160px;
+  }
+  .searchbox::placeholder{color:var(--text-faint);}
 
-/* ─── FLOW ─── */
-.flow { padding: 110px 56px; background: var(--panel); border-bottom: 1px solid var(--line); }
-.flow-inner { max-width: 760px; margin: 0 auto; }
-.flow-title { margin-bottom: 56px; }
-.flow-item { display: grid; grid-template-columns: 56px 1fr; gap: 20px; padding: 30px 0; border-top: 1px solid var(--line); }
-.flow-item:last-child { border-bottom: 1px solid var(--line); }
-.flow-num { font-family: 'Zen Old Mincho', serif; font-size: 22px; color: var(--navy); padding-top: 2px; }
-.flow-step-title { font-size: 14px; font-weight: 500; margin-bottom: 7px; }
-.flow-step-body { font-size: 13px; line-height: 1.9; color: var(--gray); }
+  .timeline-panel + .timeline-panel{margin-top:22px;}
+  .timeline-label{font-size:12px;color:var(--text-dim);margin-bottom:6px;}
 
-/* ─── FAQ ─── */
-.faq { padding: 110px 56px; border-bottom: 1px solid var(--line); }
-.faq-inner { max-width: 760px; margin: 0 auto; }
-.faq-title { margin-bottom: 56px; }
-.faq-item { border-top: 1px solid var(--line); }
-.faq-item:last-child { border-bottom: 1px solid var(--line); }
-.faq-q {
-  width: 100%; background: none; border: none; text-align: left;
-  padding: 26px 0; display: flex; justify-content: space-between; align-items: center;
-  gap: 24px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif;
-  font-size: 14px; font-weight: 400; color: var(--ink); line-height: 1.6;
-}
-.faq-icon { width: 18px; height: 18px; flex-shrink: 0; position: relative; }
-.faq-icon::before, .faq-icon::after { content: ''; position: absolute; background: var(--navy); transition: transform 0.3s ease, opacity 0.3s ease; }
-.faq-icon::before { width: 1px; height: 100%; left: 50%; transform: translateX(-50%); }
-.faq-icon::after { width: 100%; height: 1px; top: 50%; transform: translateY(-50%); }
-.faq-item.open .faq-icon::before { transform: translateX(-50%) rotate(90deg); opacity: 0; }
-.faq-a { font-size: 13px; line-height: 2.2; color: var(--gray); max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
-.faq-item.open .faq-a { max-height: 280px; padding-bottom: 26px; }
+  .gantt{
+    display:grid;
+    grid-template-columns:92px repeat(20, 1fr);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    font-size:11px;
+  }
+  .gantt .g-head{
+    background:var(--surface-2);
+    font-family:'Oswald',sans-serif;
+    font-size:10px;
+    color:var(--text-faint);
+    text-align:center;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+    border-left:1px solid var(--line);
+  }
+  .gantt .g-head:first-child{border-left:none;}
+  .gantt .g-head.zone-early{background:rgba(138,145,153,0.16);}
+  .gantt .g-head.zone-late{background:rgba(229,72,77,0.22);}
+  .gantt .g-rowlabel{
+    background:var(--surface-2);
+    font-size:12px;
+    color:var(--text-dim);
+    display:flex;align-items:center;
+    padding:0 10px;
+    border-top:1px solid var(--line);
+    white-space:nowrap;
+    transition:background .1s,color .1s;
+  }
+  .gantt .g-rowlabel .gk-tag{font-size:10px;color:var(--text-faint);margin-left:6px;}
+  .gantt .g-rowlabel.row-hover{background:var(--surface);color:var(--text);}
+  .gantt .g-cell{
+    min-height:28px;
+    border-top:1px solid var(--line);
+    border-left:1px solid var(--line);
+    background:var(--surface);
+    position:relative;
+  }
+  .gantt .g-cell.zone-early{background:rgba(138,145,153,0.06);}
+  .gantt .g-cell.zone-late{background:rgba(229,72,77,0.10);}
+  .gantt .g-cell.filled{cursor:pointer;}
+  .gantt .g-cell.row-hover{background:var(--surface-2);}
+  .gantt .g-cell.row-hover .g-fill{filter:brightness(1.18);}
+  .gantt .g-cell.dim .g-fill{opacity:0.15;}
+  .gantt .g-fill{position:absolute;inset:3px;border-radius:3px;transition:opacity .15s,filter .1s;}
+  .gantt .g-empty-note{grid-column:1 / -1;padding:16px;font-size:13px;color:var(--text-faint);text-align:center;background:var(--surface);}
 
-/* ─── CONTACT ─── */
-.contact { padding: 110px 56px; background: var(--ink); }
-.contact-inner { max-width: 800px; margin: 0 auto; }
-.contact-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: rgba(250,250,248,0.45); display: block; margin-bottom: 18px; }
-.contact-title { font-family: 'Zen Old Mincho', serif; font-size: clamp(28px, 4vw, 46px); font-weight: 500; color: var(--bg); margin-bottom: 16px; line-height: 1.4; }
-.contact-sub { font-size: 13px; color: rgba(250,250,248,0.45); line-height: 2; margin-bottom: 52px; }
-.contact-form { display: flex; flex-direction: column; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-.form-field { display: flex; flex-direction: column; background: rgba(250,250,248,0.035); border: 1px solid rgba(250,250,248,0.1); margin-bottom: 1px; transition: border-color 0.25s; }
-.form-field:focus-within { border-color: rgba(250,250,248,0.4); }
-.form-field.full { grid-column: 1 / -1; }
-.form-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: rgba(250,250,248,0.32); padding: 15px 18px 0; }
-.form-field input, .form-field textarea {
-  background: none; border: none; outline: none; font-family: 'Noto Sans JP', sans-serif;
-  font-size: 14px; font-weight: 300; color: var(--bg); padding: 7px 18px 15px; resize: none; width: 100%;
-}
-.form-field textarea { min-height: 110px; }
-.form-field input::placeholder, .form-field textarea::placeholder { color: rgba(250,250,248,0.18); }
-.form-submit {
-  margin-top: 24px; background: var(--bg); color: var(--ink); border: none;
-  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
-  padding: 18px 38px; cursor: pointer; transition: opacity 0.25s; align-self: flex-start;
-}
-.form-submit:hover { opacity: 0.8; }
-.contact-divider {
-  display: flex; align-items: center; gap: 18px; margin: 40px 0;
-  color: rgba(250,250,248,0.15); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em;
-}
-.contact-divider::before, .contact-divider::after { content: ''; flex: 1; height: 1px; background: rgba(250,250,248,0.1); }
-.line-btn {
-  display: flex; align-items: center; gap: 14px; background: rgba(250,250,248,0.035);
-  border: 1px solid rgba(250,250,248,0.1); padding: 17px 26px; text-decoration: none;
-  transition: border-color 0.25s, background 0.25s; width: fit-content;
-}
-.line-btn:hover { border-color: #06C755; background: rgba(6,199,85,0.06); }
-.line-icon { width: 20px; height: 20px; fill: #06C755; flex-shrink: 0; }
-.line-btn-text { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--bg); }
+  #ganttTooltip{
+    position:fixed;
+    z-index:80;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12px;
+    color:var(--text);
+    max-width:240px;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .1s;
+    box-shadow:0 6px 20px rgba(0,0,0,0.4);
+  }
+  #ganttTooltip.show{opacity:1;}
+  #ganttTooltip .tt-title{font-weight:500;margin-bottom:2px;}
+  #ganttTooltip .tt-sub{color:var(--text-dim);font-size:11px;}
+  #ganttTooltip hr{border:none;border-top:1px solid var(--line);margin:6px 0;}
 
-/* ─── FOOTER ─── */
-footer { padding: 28px 56px; background: var(--ink); border-top: 1px solid rgba(250,250,248,0.06); display: flex; justify-content: space-between; align-items: center; }
-.footer-logo img { height: 24px; filter: brightness(0) invert(1); opacity: 0.55; }
-.footer-logo-fallback { font-family: 'Zen Old Mincho', serif; font-size: 15px; letter-spacing: 0.2em; color: rgba(250,250,248,0.45); }
-.footer-copy { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; color: rgba(250,250,248,0.2); }
+  /* ---- executive summary ---- */
+  .exec-list{margin:0;padding:0;list-style:none;}
+  .exec-list li{
+    display:flex;gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid rgba(44,52,59,0.5);
+    font-size:14px;
+    color:var(--text);
+  }
+  .exec-list li:last-child{border-bottom:none;}
+  .exec-list .exec-num{
+    font-family:'Oswald',sans-serif;font-weight:700;color:var(--c-accent);
+    flex:none;width:22px;
+  }
+  .exec-list b{font-weight:500;}
+  .exec-list .exec-sub{display:block;font-size:12px;color:var(--text-dim);margin-top:2px;}
 
-/* ─── REVEAL ─── */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1); }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+  /* ---- caveat / limitation box ---- */
+  .caveat{
+    display:flex;gap:10px;
+    background:rgba(229,72,77,0.10);
+    border:1px solid rgba(229,72,77,0.3);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-bottom:16px;
+  }
+  .caveat .cv-mark{flex:none;color:var(--c-accent);font-family:'Oswald',sans-serif;font-weight:700;}
+  .caveat b{color:var(--text);font-weight:500;}
 
-/* ─── MOBILE ─── */
-@media (max-width: 768px) {
-  nav { padding: 16px 20px; }
-  .nav-logo img { height: 26px; }
-  .nav-btn { font-size: 9px; padding: 9px 16px; }
+  /* ---- season trend chart ---- */
+  .trend-wrap{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:10px;}
+  .trend-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;}
+  .trend-bars{width:100%;max-width:38px;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;overflow:hidden;}
+  .trend-seg-front{background:var(--c-normal);}
+  .trend-seg-back{background:var(--c-accent);}
+  .trend-total{font-size:11px;color:var(--text-dim);margin-bottom:4px;font-variant-numeric:tabular-nums;}
+  .trend-label{font-size:11px;color:var(--text-dim);margin-top:6px;text-align:center;line-height:1.3;}
+  .trend-label .gk-mini{display:block;font-size:10px;color:var(--text-faint);}
 
-  .hero { padding: 110px 20px 60px; min-height: auto; }
-  .hero-heading { font-size: clamp(32px, 8vw, 48px); line-height: 1.45; }
-  .hero-rule { margin: 32px 0; height: 40px; }
-  .hero-sub { font-size: 13px; }
-  .hero-cta-row { flex-direction: column; align-items: flex-start; gap: 14px; width: 100%; }
-  .hero-cta-btn { width: 100%; text-align: center; padding: 17px 0; }
+  /* ---- glossary ---- */
+  .glossary{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 24px;font-size:12.5px;}
+  .glossary dt{color:var(--text);font-weight:500;display:inline;}
+  .glossary dd{color:var(--text-dim);display:inline;margin:0;}
+  .glossary .g-item{padding:4px 0;border-bottom:1px solid rgba(44,52,59,0.4);}
+  @media (max-width:640px){ .glossary{grid-template-columns:1fr;} }
 
-  .reality { padding: 64px 20px; }
-  .reality-inner { grid-template-columns: 1fr; gap: 32px; }
-  .reality-title { font-size: clamp(20px, 6vw, 28px); }
+  .match-group{margin-bottom:14px;}
+  .match-group:last-child{margin-bottom:0;}
+  .match-head{
+    display:flex;align-items:baseline;gap:10px;
+    padding:8px 4px;
+    border-bottom:1px solid var(--line);
+    font-family:'Oswald',sans-serif;
+  }
+  .match-head .sec{font-size:11px;color:var(--text-faint);letter-spacing:0.08em;}
+  .match-head .opp{font-size:15px;font-weight:600;color:var(--text);}
+  .match-head .gk{font-size:11px;color:var(--text-faint);}
+  .match-head .cnt{margin-left:auto;font-size:12px;color:var(--text-dim);}
+  .incident{
+    display:grid;
+    grid-template-columns:52px 56px 108px 1fr;
+    gap:10px;
+    align-items:center;
+    padding:7px 4px;
+    border-bottom:1px solid rgba(44,52,59,0.5);
+    font-size:13px;
+  }
+  .incident:last-child{border-bottom:none;}
+  .incident.hidden{display:none;}
+  .incident .half{color:var(--text-dim);font-size:11px;}
+  .incident .time{font-variant-numeric:tabular-nums;color:var(--text);}
+  .incident .tag{
+    font-size:11px;padding:2px 8px;border-radius:10px;
+    justify-self:start;white-space:nowrap;
+  }
+  .incident .detail{color:var(--text-dim);}
+  .empty-note{color:var(--text-faint);font-size:13px;padding:10px 4px;}
 
-  .concept { padding: 72px 20px; }
-  .concept-inner { grid-template-columns: 1fr; gap: 40px; }
+  footer{margin-top:26px;text-align:center;font-size:11px;color:var(--text-faint);}
 
-  .target { padding: 72px 20px; }
-  .target-grid { grid-template-columns: 1fr; }
-  .target-card { padding: 32px 24px; }
-
-  .reasons { padding: 72px 20px; }
-  .reason-item { grid-template-columns: 40px 1fr; gap: 14px; }
-  .reason-body { grid-column: 2; }
-
-  .works { padding: 72px 20px; }
-  .works-grid { grid-template-columns: 1fr; }
-
-  .price { padding: 72px 20px; }
-  .price-head { flex-direction: column; align-items: flex-start; gap: 14px; }
-  .price-head-note { text-align: left; }
-  .price-plans { grid-template-columns: 1fr; }
-  .plan { padding: 32px 24px; }
-
-  .flow { padding: 72px 20px; }
-  .flow-item { grid-template-columns: 40px 1fr; gap: 14px; }
-
-  .faq { padding: 72px 20px; }
-
-  .contact { padding: 72px 20px; }
-  .form-row { grid-template-columns: 1fr; }
-  .form-submit { width: 100%; text-align: center; }
-
-  footer { flex-direction: column; gap: 10px; text-align: center; padding: 24px 20px; }
-}
+  @media (max-width:640px){
+    .bands{grid-template-columns:repeat(2,1fr);}
+    .incident{grid-template-columns:44px 48px 88px 1fr;}
+    .barrow .barval{width:110px;}
+  }
 </style>
 </head>
 <body>
+<div id="ganttTooltip"></div>
+<div class="wrap">
 
-<nav>
-  <a href="#" class="nav-logo">
-    <img src="https://i.postimg.cc/FzV3F3Wd/S-7897091.jpg" alt="LAMARI"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-    <span class="nav-logo-fallback" style="display:none">LAMARI</span>
-  </a>
-  <a href="#contact" class="nav-btn">CONTACT</a>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <p class="hero-tag">WEBSITE PRODUCTION SERVICE</p>
-    <h1 class="hero-heading">
-      価値は、<span class="accent">照らされて</span><br>伝わる。
-    </h1>
-    <div class="hero-rule"></div>
-    <p class="hero-sub">
-      アスリート、個人事業主、スタートアップ。<br>
-      <strong>本物の実力を持ちながら、まだ届いていない人</strong>のための<br>
-      ホームページ制作サービス。
-    </p>
-    <div class="hero-cta-row">
-      <a href="#contact" class="hero-cta-btn">お問い合わせはこちら</a>
-      <span class="hero-cta-note">無料相談受付中</span>
+  <header>
+    <p class="eyebrow">Defensive report</p>
+    <h1>失点分析ボード</h1>
+    <div class="scope-row">
+      <label>ゴレイロ</label>
+      <select id="playerSelect">
+        <option value="all">すべて</option>
+        <option value="西">西</option>
+        <option value="橋野">橋野</option>
+      </select>
+      <div class="chip-group" id="respGroup"></div>
     </div>
-  </div>
-</section>
+    <div class="board" id="scoreboard"></div>
+  </header>
 
-<!-- REALITY -->
-<section class="reality">
-  <div class="reality-inner">
-    <div class="reveal">
-      <span class="reality-label">REALITY</span>
-      <h2 class="reality-title">
-        ホームページ制作の相場は、<br>
-        <span class="strike">15万〜30万円</span>。
-      </h2>
+  <section>
+    <p class="section-title">エグゼクティブサマリー</p>
+    <div class="card">
+      <ol class="exec-list" id="execSummary"></ol>
     </div>
-    <div class="reveal reveal-delay">
-      <p class="reality-body">
-        でも、それでは始められない人がいる。<br><br>
-        LAMARIは、<strong>必要な機能だけを見極め</strong>、<br>
-        適正な価格でホームページを提供します。
-      </p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-track">
-    <span class="ticker-item">LAMARI</span>
-    <span class="ticker-item">WEBSITE PRODUCTION</span>
-    <span class="ticker-item">LIGHT × MARRY</span>
-    <span class="ticker-item">ATHLETE</span>
-    <span class="ticker-item">FREELANCE</span>
-    <span class="ticker-item">STARTUP</span>
-    <span class="ticker-item">BRANDING</span>
-    <span class="ticker-item">LAMARI</span>
-    <span class="ticker-item">WEBSITE PRODUCTION</span>
-    <span class="ticker-item">LIGHT × MARRY</span>
-    <span class="ticker-item">ATHLETE</span>
-    <span class="ticker-item">FREELANCE</span>
-    <span class="ticker-item">STARTUP</span>
-    <span class="ticker-item">BRANDING</span>
-  </div>
+  <section>
+    <p class="section-title">節ごとの失点推移（前半／後半）</p>
+    <p class="section-sub">シーズンを通じて悪化・改善しているか、GK交代のタイミングと合わせて確認</p>
+    <div class="card">
+      <div class="legend-mini">
+        <span><i style="background:var(--c-normal)"></i>前半失点</span>
+        <span><i style="background:var(--c-accent)"></i>後半失点</span>
+      </div>
+      <div class="trend-wrap" id="trendChart"></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">ゴレイロ比較（試合数差を調整した割合ベース）</p>
+    <p class="section-sub">西：3試合 ／ 橋野：6試合 － 件数だけでなく試合あたり・割合で比較</p>
+    <div class="caveat">
+      <span class="cv-mark">!</span>
+      <span><b>サンプルサイズに注意：</b>西は3試合、橋野は6試合と母数が小さいため、ここでの割合差は傾向の参考値であり統計的に確定した差ではない。同じ傾向が続くか、今後の試合でも継続してデータを蓄積して検証する必要がある。</span>
+    </div>
+    <div class="card">
+      <table class="compare" id="compareTable"></table>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">時間帯 × ゴレイロ 比較表</p>
+    <p class="section-sub">前半／後半をそれぞれ0〜10分・10〜20分に分け、西・橋野・全体で並べて集計。PPG（ゴレイロ関与なしの失点）を含む/除くを切り替え可能</p>
+    <div class="card">
+      <div class="chip-group" id="hpFilterGroup" style="margin-bottom:14px;"></div>
+      <table class="compare" id="halfPlayerTable"></table>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">前半／後半 × 特殊局面（PP・PK・退場局面・2-0カウンター）vs 通常局面</p>
+    <p class="section-sub">前半・後半の失点を特殊局面／通常局面に分解して集計</p>
+    <div class="card">
+      <div class="caveat" style="margin-bottom:14px;">
+        <span class="cv-mark">!</span>
+        <span><b>データの限界：</b>ここにあるのは「実際に失点した」件数のみで、PPやセットプレーなど各局面を何回<b>迎えて</b>何回防いだかの分母がない。したがって「発生件数」の比較であり「失敗率」の比較ではない点に留意。今後は局面ごとの発生回数（例：PPで守った回数）も記録できると、真の失点率を出せるようになる。</span>
+      </div>
+      <div class="legend-mini">
+        <span><i style="background:var(--c-normal)"></i>通常局面（定位置・カウンター・セットプレー等）</span>
+        <span><i style="background:var(--c-special)"></i>特殊局面（PP・PK・退場局面・2-0カウンター）</span>
+      </div>
+      <div id="halfCompare"></div>
+      <div class="verdict" id="verdictText"></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">時間帯別 失点数・割合（現在の選択範囲）</p>
+    <div class="card">
+      <div class="bands" id="bands"></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">失点シーン内訳</p>
+    <div class="card">
+      <div id="catbars"></div>
+      <dl class="glossary" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+        <div class="g-item"><dt>定位置</dt> — <dd>通常の守備配置の中でのブロック・セグンド対応からの失点</dd></div>
+        <div class="g-item"><dt>PP</dt> — <dd>パワープレー（5対4）対応中の失点。ゴレイロの責任は個別判断</dd></div>
+        <div class="g-item"><dt>PPG</dt> — <dd>パワープレー対応中でもゴレイロには責任がないと判断された失点</dd></div>
+        <div class="g-item"><dt>カウンター</dt> — <dd>攻撃から守備への切り替え局面での速攻対応ミス</dd></div>
+        <div class="g-item"><dt>セットプレー</dt> — <dd>コーナーキック・キックインなどのデッドボールからの失点</dd></div>
+        <div class="g-item"><dt>PK</dt> — <dd>ペナルティキックによる失点</dd></div>
+        <div class="g-item"><dt>その他</dt> — <dd>被シュート・GKの攻撃参加時のミス・退場局面など個別ケース</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">タイムライン（クリックで絞り込み／ホバーで詳細）</p>
+    <div class="card">
+      <div class="filters" id="filters"></div>
+      <div class="timeline-panel">
+        <div class="timeline-label">前半（0〜20分・1分刻み）</div>
+        <div class="gantt" id="tl-front"></div>
+      </div>
+      <div class="timeline-panel">
+        <div class="timeline-label">後半（0〜20分・1分刻み）</div>
+        <div class="gantt" id="tl-back"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">試合別ログ</p>
+    <div class="card" id="log"></div>
+  </section>
+
+  <footer>浦安・湘南・北九州・立川・北海道・町田・大分・すみだ・しながわ戦 / ゴレイロ：橋野（浦安〜北海道・しながわ・6試合）／西（町田・大分・すみだ・3試合）</footer>
 </div>
 
-<!-- CONCEPT -->
-<section class="concept">
-  <div class="concept-inner">
-    <div class="reveal">
-      <span class="section-label">CONCEPT</span>
-      <h2 class="section-title">Light × Marry</h2>
-      <p class="concept-body">
-        実力はある。結果も出している。<br>
-        <strong>でも、知られていない。</strong><br><br>
-        LAMARIは、あなたの価値に光を当て、<br>
-        必要な人へとつなぐホームページ制作サービスです。<br><br>
-        スポンサー、クライアント、パートナー——<br>
-        「この人に頼みたい」と思わせる公式ページを、<br>
-        あなたのことを理解した人間がつくります。
-      </p>
-    </div>
-    <div class="concept-stats reveal reveal-delay">
-      <div class="concept-stat">
-        <span class="concept-stat-label">WEBSITE ONLY</span>
-        <span class="concept-stat-val">¥50,000〜</span>
-      </div>
-      <div class="concept-stat">
-        <span class="concept-stat-label">BLOG / FAN CLUB</span>
-        <span class="concept-stat-val">¥100,000〜</span>
-      </div>
-      <div class="concept-stat">
-        <span class="concept-stat-label">DELIVERY</span>
-        <span class="concept-stat-val">最短2週間</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TARGET -->
-<section class="target">
-  <div class="target-inner">
-    <span class="section-label reveal">FOR</span>
-    <h2 class="section-title target-title reveal">こんな方へ</h2>
-    <div class="target-grid">
-      <div class="target-card reveal">
-        <div class="target-num">01</div>
-        <div class="target-card-title">アスリート</div>
-        <div class="target-card-body">スポンサー獲得・認知拡大・自己ブランディングをしたい選手。競技の外でも、あなたの価値が届く場所をつくります。</div>
-      </div>
-      <div class="target-card reveal reveal-delay">
-        <div class="target-num">02</div>
-        <div class="target-card-title">個人で活動されている方</div>
-        <div class="target-card-body">フリーランス・クリエイター・トレーナー・講師など、実績はあるが発信の場所がない方。</div>
-      </div>
-      <div class="target-card reveal reveal-delay-2">
-        <div class="target-num">03</div>
-        <div class="target-card-title">会社立ち上げ初期の方</div>
-        <div class="target-card-body">まず「ちゃんとした顔」をWeb上につくりたい方。スタートに必要なものを、適正な価格で。</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- REASONS -->
-<section class="reasons">
-  <div class="reasons-inner">
-    <span class="section-label reveal">WHY LAMARI</span>
-    <h2 class="section-title reasons-title reveal">選ばれる理由</h2>
-    <div class="reveal">
-      <div class="reason-item">
-        <div class="reason-num">01</div>
-        <div class="reason-title">あなたの「伝わり方」を設計する</div>
-        <div class="reason-body">制作だけでなく、見せ方・訴求の構成から考えます。誰に、何を、どう届けるか。それがLAMARIの仕事です。</div>
-      </div>
-      <div class="reason-item">
-        <div class="reason-num">02</div>
-        <div class="reason-title">どんなフェーズでも対応できる</div>
-        <div class="reason-body">個人活動の立ち上げから、法人化直後のブランディングまで。規模や知名度に関わらず対応します。</div>
-      </div>
-      <div class="reason-item">
-        <div class="reason-num">03</div>
-        <div class="reason-title">最短2週間、適正価格で納品</div>
-        <div class="reason-body">相場の半分以下から始められる料金設計。スピードと品質を両立し、必要なものだけをご提案します。</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WORKS -->
-<section class="works">
-  <div class="works-inner">
-    <span class="section-label reveal">WORKS</span>
-    <h2 class="section-title works-title reveal">制作実績</h2>
-    <div class="works-grid reveal">
-      <a href="https://maenao-official.pages.dev" target="_blank" rel="noopener" class="work-card">
-        <div class="work-top">
-          <span class="work-sport">FUTSAL PLAYER</span>
-          <div class="work-name">前川 尚志</div>
-          <div class="work-team">ボアルース長野 / FP（ピヴォ）</div>
-        </div>
-        <div class="work-bottom">
-          <span class="work-link-label">VIEW SITE</span>
-          <span class="work-arrow">→</span>
-        </div>
-      </a>
-      <a href="https://hnam9oficial.pages.dev" target="_blank" rel="noopener" class="work-card">
-        <div class="work-top">
-          <span class="work-sport">FUTSAL PLAYER</span>
-          <div class="work-name">平田 ネト<br>アントニオ マサノリ</div>
-          <div class="work-team">SHINAGAWA CITY / 日本代表</div>
-        </div>
-        <div class="work-bottom">
-          <span class="work-link-label">VIEW SITE</span>
-          <span class="work-arrow">→</span>
-        </div>
-      </a>
-      <a href="https://nishi-official.com" target="_blank" rel="noopener" class="work-card">
-        <div class="work-top">
-          <span class="work-sport">FUTSAL GOLEIRO</span>
-          <div class="work-name">西 滉太</div>
-          <div class="work-team">ボアルース長野 / #24</div>
-        </div>
-        <div class="work-bottom">
-          <span class="work-link-label">VIEW SITE</span>
-          <span class="work-arrow">→</span>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- PRICE -->
-<section class="price">
-  <div class="price-inner">
-    <div class="price-head reveal">
-      <div>
-        <span class="section-label">PRICE</span>
-        <h2 class="section-title">料金プラン</h2>
-      </div>
-      <div class="price-head-note">すべて税別表示<br>お問い合わせから承ります</div>
-    </div>
-    <div class="price-plans reveal">
-      <div class="plan">
-        <span class="plan-badge">SIMPLE</span>
-        <div class="plan-name">ホームページのみ</div>
-        <div class="plan-price-row">
-          <span class="plan-yen">¥</span>
-          <span class="plan-num">50,000</span>
-          <span class="plan-unit">〜</span>
-        </div>
-        <ul class="plan-list">
-          <li>プロフィール・実績ページ</li>
-          <li>SNSリンク・お問い合わせフォーム</li>
-          <li>スマートフォン対応</li>
-          <li>公開後1ヶ月サポート</li>
-        </ul>
-        <a href="#contact" class="plan-cta">相談する →</a>
-      </div>
-      <div class="plan center">
-        <span class="plan-badge">STANDARD — おすすめ</span>
-        <div class="plan-name">ブログ・ファンクラブ<br>サイト開発</div>
-        <div class="plan-price-row">
-          <span class="plan-yen">¥</span>
-          <span class="plan-num">100,000</span>
-          <span class="plan-unit">〜</span>
-        </div>
-        <ul class="plan-list">
-          <li>ホームページ機能をすべて含む</li>
-          <li><strong>ブログ・更新機能</strong>の実装</li>
-          <li><strong>ファンクラブ・会員機能</strong>の実装</li>
-          <li>スポンサー向けページ構成</li>
-          <li>公開後サポート</li>
-        </ul>
-        <a href="#contact" class="plan-cta">相談する →</a>
-      </div>
-      <div class="plan">
-        <span class="plan-badge">CUSTOM</span>
-        <div class="plan-name">それ以上の<br>規模・機能</div>
-        <div class="plan-price-row">
-          <span class="plan-num" style="font-size:28px;">要相談</span>
-        </div>
-        <ul class="plan-list">
-          <li>複数選手・チーム単位のサイト</li>
-          <li>決済機能・予約システムなど</li>
-          <li>独自ドメイン・本格運用設計</li>
-          <li>内容に応じてお見積もり</li>
-        </ul>
-        <a href="#contact" class="plan-cta">相談する →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FLOW -->
-<section class="flow">
-  <div class="flow-inner">
-    <span class="section-label reveal">FLOW</span>
-    <h2 class="section-title flow-title reveal">制作の流れ</h2>
-    <div class="reveal">
-      <div class="flow-item">
-        <div class="flow-num">01</div>
-        <div><div class="flow-step-title">お問い合わせ（無料）</div><div class="flow-step-body">まずはお気軽にご連絡ください。</div></div>
-      </div>
-      <div class="flow-item">
-        <div class="flow-num">02</div>
-        <div><div class="flow-step-title">プラン選択</div><div class="flow-step-body">必要な機能をヒアリングし、最適なプランをご提案します。</div></div>
-      </div>
-      <div class="flow-item">
-        <div class="flow-num">03</div>
-        <div><div class="flow-step-title">ヒアリング・素材収集</div><div class="flow-step-body">写真・プロフィール・実績などをご提供いただきます。</div></div>
-      </div>
-      <div class="flow-item">
-        <div class="flow-num">04</div>
-        <div><div class="flow-step-title">制作</div><div class="flow-step-body">1週間で初稿を提出。修正点を擦り合わせ、2週間で完全納品します。</div></div>
-      </div>
-      <div class="flow-item">
-        <div class="flow-num">05</div>
-        <div><div class="flow-step-title">公開・運用開始</div><div class="flow-step-body">公開後もサポートします。</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="faq">
-  <div class="faq-inner">
-    <span class="section-label reveal">FAQ</span>
-    <h2 class="section-title faq-title reveal">よくある質問</h2>
-    <div class="reveal">
-      <div class="faq-item">
-        <button class="faq-q"><span>どんな業種・競技でも対応できますか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">はい。アスリート、フリーランス、スタートアップなど、業種・競技・レベル問わず対応しています。まずはお気軽にご相談ください。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>ホームページのみとファンクラブ開発、どちらを選ぶべきですか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">プロフィールや実績を伝えるだけなら「ホームページのみ」で十分です。会員限定コンテンツやファンとの継続的な接点を作りたい場合は「ブログ・ファンクラブサイト開発」がおすすめです。迷ったらご相談ください。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>写真や素材がない場合はどうすればいいですか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">ヒアリング時にご相談ください。テキスト中心の構成や、フリー素材を活用したデザインでも高品質に仕上げます。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>公開後に自分でページを更新できますか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">基本的にはご自身での更新となりますが、ご希望に応じて更新代行も承っています。詳細はお問い合わせ時にご相談ください。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>ドメインやサーバーは自分で用意が必要ですか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">ご希望に応じてLAMARI側で手配することも可能です。お見積もり時にご相談ください。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>修正の範囲はどこまでですか？</span><span class="faq-icon"></span></button>
-        <div class="faq-a">テキスト・画像の差し替え、レイアウトの調整など通常の更新作業は対応します。大幅な追加・再設計は別途お見積もりとなります。</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q"><span>支払い方法を教えてください。</span><span class="faq-icon"></span></button>
-        <div class="faq-a">銀行振込に対応しています。詳細はお問い合わせ時にご案内します。</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section class="contact" id="contact">
-  <div class="contact-inner">
-    <span class="contact-label reveal">CONTACT</span>
-    <h2 class="contact-title reveal">お問い合わせ</h2>
-    <p class="contact-sub reveal">どんな競技でも、どんなレベルでも。まずはご連絡ください。</p>
-
-    <form class="contact-form reveal" id="contactForm">
-      <div class="form-row">
-        <div class="form-field">
-          <label class="form-label">お名前 *</label>
-          <input type="text" name="name" placeholder="山田 太郎" required>
-        </div>
-        <div class="form-field">
-          <label class="form-label">メールアドレス *</label>
-          <input type="email" name="email" placeholder="example@email.com" required>
-        </div>
-      </div>
-      <div class="form-field full">
-        <label class="form-label">ご相談内容 *</label>
-        <textarea name="message" placeholder="競技・業種・ご希望のプランなどをお気軽にご記入ください。" required></textarea>
-      </div>
-      <button type="submit" class="form-submit" id="formSubmitBtn">送信する →</button>
-    </form>
-
-    <div id="formThanks" style="display:none; padding:48px 0; opacity:0; transition:opacity 0.8s ease;">
-      <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px;">
-        <div style="width:36px; height:1px; background:rgba(250,250,248,0.4);"></div>
-        <span style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.3em; color:rgba(250,250,248,0.5);">THANK YOU</span>
-      </div>
-      <h3 style="font-family:'Zen Old Mincho',serif; font-size:clamp(22px,3.5vw,32px); font-weight:500; color:var(--bg); line-height:1.5; margin-bottom:20px;">
-        お問い合わせを受け付けました。
-      </h3>
-      <p style="font-size:13px; line-height:2.3; color:rgba(250,250,248,0.45);">
-        内容を確認の上、担当者よりご連絡いたします。<br>
-        通常2〜3営業日以内にご返信します。
-      </p>
-    </div>
-
-    <div class="contact-divider">OR</div>
-
-    <a href="https://lin.ee/t1tfj40" target="_blank" rel="noopener" class="line-btn">
-      <svg class="line-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
-      </svg>
-      <span class="line-btn-text">LINEで相談する</span>
-    </a>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-logo">
-    <img src="https://i.postimg.cc/FzV3F3Wd/S-7897091.jpg" alt="LAMARI"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-    <span class="footer-logo-fallback" style="display:none">LAMARI</span>
-  </div>
-  <div class="footer-copy">© 2025 LAMARI. ALL RIGHTS RESERVED.</div>
-</footer>
-
 <script>
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-  }, { threshold: 0.07 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+const CATS = {
+  '定位置':     {color:'var(--c-teichi)'},
+  'PP':         {color:'var(--c-pp)'},
+  'PPG':        {color:'var(--c-ppg)'},
+  'カウンター': {color:'var(--c-counter)'},
+  'セットプレー':{color:'var(--c-setplay)'},
+  'PK':         {color:'var(--c-pk)'},
+  'その他':     {color:'var(--c-other)'}
+};
 
-  document.querySelectorAll('.faq-q').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
+function tm(str){
+  const [m,s] = str.split(':').map(Number);
+  return m + s/60;
+}
+
+const RAW = [
+  {sec:1,opp:'浦安',   player:'橋野',half:'前',t:'2:53', cat:'定位置',      noFault:false, special:false, detail:'定位置（セグンド）'},
+  {sec:1,opp:'浦安',   player:'橋野',half:'前',t:'8:05', cat:'定位置',      noFault:false, special:false, detail:'定位置（ブロック）'},
+  {sec:1,opp:'浦安',   player:'橋野',half:'前',t:'13:22',cat:'定位置',      noFault:false, special:false, detail:'定位置（セグンド）'},
+  {sec:1,opp:'浦安',   player:'橋野',half:'後',t:'18:47',cat:'PPG',         noFault:true,  special:false, detail:''},
+
+  {sec:2,opp:'湘南',   player:'橋野',half:'前',t:'0:41', cat:'定位置',      noFault:false, special:false, detail:'定位置（被シュート13m）'},
+  {sec:2,opp:'湘南',   player:'橋野',half:'前',t:'14:31',cat:'セットプレー',noFault:false, special:false, detail:'キックイン（被シュート17mゴール前フリック）'},
+  {sec:2,opp:'湘南',   player:'橋野',half:'後',t:'0:47', cat:'セットプレー',noFault:false, special:false, detail:'コーナーキック（セグンド）'},
+  {sec:2,opp:'湘南',   player:'橋野',half:'後',t:'2:31', cat:'カウンター',  noFault:false, special:false, detail:'カウンター（二連ブロックミス）'},
+
+  {sec:3,opp:'北九州', player:'橋野',half:'前',t:'2:40', cat:'定位置',      noFault:false, special:false, detail:'定位置（ブロック？）'},
+  {sec:3,opp:'北九州', player:'橋野',half:'後',t:'2:34', cat:'PK',          noFault:false, special:true,  detail:''},
+  {sec:3,opp:'北九州', player:'橋野',half:'後',t:'4:40', cat:'その他',      noFault:false, special:false, detail:'前プレ失点（準備）'},
+  {sec:3,opp:'北九州', player:'橋野',half:'後',t:'19:00',cat:'PPG',         noFault:true,  special:false, detail:''},
+
+  {sec:4,opp:'立川',   player:'橋野',half:'前',t:'4:45', cat:'カウンター',  noFault:false, special:true,  detail:'カウンター（2-0）'},
+  {sec:4,opp:'立川',   player:'橋野',half:'後',t:'15:24',cat:'セットプレー',noFault:false, special:false, detail:'セットプレー（ブロック）'},
+  {sec:4,opp:'立川',   player:'橋野',half:'後',t:'16:14',cat:'PPG',         noFault:true,  special:false, detail:'交代ミス？'},
+
+  {sec:5,opp:'北海道', player:'橋野',half:'前',t:'1:42', cat:'カウンター',  noFault:false, special:false, detail:'カウンター（ブロック）'},
+  {sec:5,opp:'北海道', player:'橋野',half:'前',t:'6:46', cat:'セットプレー',noFault:false, special:false, detail:'コーナーキック（1番とゴレイロの間）'},
+  {sec:5,opp:'北海道', player:'橋野',half:'後',t:'15:13',cat:'セットプレー',noFault:false, special:false, detail:'コーナーキック（セカンドアクション）'},
+  {sec:5,opp:'北海道', player:'橋野',half:'後',t:'15:52',cat:'定位置',      noFault:false, special:false, detail:'定位置（セグンド）'},
+  {sec:5,opp:'北海道', player:'橋野',half:'後',t:'16:14',cat:'カウンター',  noFault:false, special:false, detail:'カウンター（ブロック）'},
+
+  {sec:6,opp:'町田',   player:'西',  half:'後',t:'3:52', cat:'PP',          noFault:false, special:true,  detail:''},
+  {sec:6,opp:'町田',   player:'西',  half:'後',t:'12:09',cat:'PP',          noFault:false, special:true,  detail:''},
+  {sec:6,opp:'町田',   player:'西',  half:'後',t:'15:14',cat:'PP',          noFault:false, special:true,  detail:''},
+  {sec:6,opp:'町田',   player:'西',  half:'後',t:'16:36',cat:'PP',          noFault:false, special:true,  detail:''},
+  {sec:6,opp:'町田',   player:'西',  half:'後',t:'17:03',cat:'PP',          noFault:false, special:true,  detail:''},
+
+  {sec:7,opp:'大分',   player:'西',  half:'後',t:'11:07',cat:'定位置',      noFault:false, special:false, detail:'定位置（ブロック）'},
+  {sec:7,opp:'大分',   player:'西',  half:'後',t:'12:37',cat:'定位置',      noFault:false, special:false, detail:'定位置（ブロック）'},
+  {sec:7,opp:'大分',   player:'西',  half:'後',t:'19:52',cat:'PP',          noFault:false, special:true,  detail:''},
+
+  {sec:8,opp:'しながわ',player:'橋野',half:'前',t:'1:49', cat:'その他',      noFault:false, special:false, detail:'被シュート（11m）'},
+  {sec:8,opp:'しながわ',player:'橋野',half:'前',t:'9:15', cat:'その他',      noFault:false, special:false, detail:'キーパー攻撃ミス'},
+  {sec:8,opp:'しながわ',player:'橋野',half:'前',t:'16:31',cat:'定位置',      noFault:false, special:false, detail:'定位置（PIVO反転ブロック）'},
+  {sec:8,opp:'しながわ',player:'橋野',half:'後',t:'5:56', cat:'PPG',         noFault:true,  special:false, detail:''},
+  {sec:8,opp:'しながわ',player:'橋野',half:'後',t:'9:16', cat:'PPG',         noFault:true,  special:false, detail:''},
+  {sec:8,opp:'しながわ',player:'橋野',half:'後',t:'18:13',cat:'定位置',      noFault:false, special:false, detail:'定位置攻撃（ハーフボレー）'},
+
+  {sec:9,opp:'すみだ', player:'西',  half:'前',t:'12:40',cat:'定位置',      noFault:false, special:false, detail:'定位置（ブロック）'},
+  {sec:9,opp:'すみだ', player:'西',  half:'後',t:'4:56', cat:'カウンター',  noFault:false, special:true,  detail:'カウンター（2-0）'},
+  {sec:9,opp:'すみだ', player:'西',  half:'後',t:'5:31', cat:'その他',      noFault:false, special:true,  detail:'退場局面'},
+  {sec:9,opp:'すみだ', player:'西',  half:'後',t:'15:58',cat:'PP',          noFault:false, special:true,  detail:''}
+];
+
+const DATA = RAW.map((d,i)=>({...d, id:i, min:tm(d.t)}));
+const OPPONENTS = [...new Set(DATA.map(d=>d.opp))];
+const MATCH_COUNT = { '西': new Set(DATA.filter(d=>d.player==='西').map(d=>d.sec)).size,
+                       '橋野': new Set(DATA.filter(d=>d.player==='橋野').map(d=>d.sec)).size };
+
+const state = { cats:new Set(Object.keys(CATS)), half:'all', q:'', player:'all', resp:'all', hpExcludeNoFault:false };
+
+function inScope(d){
+  if(state.player!=='all' && d.player!==state.player) return false;
+  if(state.resp==='noFault' && !d.noFault) return false;
+  if(state.resp==='special' && !d.special) return false;
+  return true;
+}
+function passesLayerB(d){
+  if(!state.cats.has(d.cat)) return false;
+  if(state.half!=='all' && d.half!==state.half) return false;
+  if(state.q){
+    const q=state.q.toLowerCase();
+    if(!(d.opp.toLowerCase().includes(q) || d.detail.toLowerCase().includes(q))) return false;
+  }
+  return true;
+}
+function isOn(d){ return inScope(d) && passesLayerB(d); }
+
+function renderScopeControls(){
+  const respGroup = document.getElementById('respGroup');
+  respGroup.innerHTML='';
+  [['all','全体失点'],['noFault','関与なし失点'],['special','特殊局面失点']].forEach(([val,label])=>{
+    const chip=document.createElement('div');
+    chip.className='chip'+(state.resp===val?' active':'');
+    chip.textContent=label;
+    chip.addEventListener('click',()=>{state.resp=val; renderAll();});
+    respGroup.appendChild(chip);
+  });
+}
+document.getElementById('playerSelect').addEventListener('change',e=>{
+  state.player = e.target.value;
+  renderAll();
+});
+
+// ---- executive summary (static, from full dataset) ----
+function renderExecSummary(){
+  const total = DATA.length;
+  const matches = new Set(DATA.map(d=>d.sec)).size;
+  const specialTotal = DATA.filter(d=>d.special).length;
+  const teichiTotal = DATA.filter(d=>d.cat==='定位置').length;
+  const backLate = DATA.filter(d=>d.half==='後' && d.min>=10).length;
+  const backLatePct = (backLate/total*100).toFixed(1);
+  const specialPct = (specialTotal/total*100).toFixed(1);
+
+  const nishiBack = halfStats('西','後');
+  const hashinoBack = halfStats('橋野','後');
+  const nishiShare = nishiBack.count ? (nishiBack.special/nishiBack.count*100).toFixed(0) : '0';
+  const hashinoShare = hashinoBack.count ? (hashinoBack.special/hashinoBack.count*100).toFixed(0) : '0';
+
+  const items = [
+    `全9試合で<b>${total}失点</b>（平均${(total/matches).toFixed(1)}件/試合）。うち<b>特殊局面（PP・PK・退場局面・2-0カウンター）が${specialTotal}件（${specialPct}%）</b>で単独最大要因、次いで定位置での崩れが${teichiTotal}件。`,
+    `時間帯では<b>後半10〜20分に${backLate}件（全体の${backLatePct}%）</b>が集中しており、試合終盤の失点リスクが突出して高い。`,
+    `後半失点に占める特殊局面の割合は、西<b>${nishiShare}%</b>・橋野<b>${hashinoShare}%</b>。<span class="exec-sub">※西3試合・橋野6試合と母数が小さく参考値</span>`,
+    `PPとPPGは分けて記録しており、PPG（ゴレイロ関与なしと判断された失点）は${DATA.filter(d=>d.noFault).length}件。責任所在を分けて追うことで個人評価と組織的課題を混同しない設計にしている。`
+  ];
+  document.getElementById('execSummary').innerHTML = items.map((t,i)=>
+    `<li><span class="exec-num">${i+1}</span><span>${t}</span></li>`
+  ).join('');
+}
+
+// ---- season trend chart (static) ----
+function renderTrendChart(){
+  const bySec = {};
+  DATA.forEach(d=>{ (bySec[d.sec] ||= []).push(d); });
+  const secs = Object.keys(bySec).map(Number).sort((a,b)=>a-b);
+  const maxTotal = Math.max(...secs.map(s=>bySec[s].length));
+  const el = document.getElementById('trendChart');
+  el.innerHTML = secs.map(sec=>{
+    const rows = bySec[sec];
+    const front = rows.filter(d=>d.half==='前').length;
+    const back = rows.length - front;
+    const total = rows.length;
+    const frontH = (front/maxTotal*130).toFixed(0);
+    const backH = (back/maxTotal*130).toFixed(0);
+    return `
+      <div class="trend-col">
+        <div class="trend-total">${total}</div>
+        <div class="trend-bars" style="height:${frontH+backH}px">
+          <div class="trend-seg-front" style="height:${frontH}px"></div>
+          <div class="trend-seg-back" style="height:${backH}px"></div>
+        </div>
+        <div class="trend-label">第${sec}節<span class="gk-mini">${rows[0].opp}／${rows[0].player}</span></div>
+      </div>`;
+  }).join('');
+}
+
+
+function playerMetric(player, testFn){
+  const rows = DATA.filter(d=>d.player===player && testFn(d));
+  return rows.length;
+}
+function renderCompareTable(){
+  const players = ['西','橋野'];
+  const metrics = [
+    {label:'全体失点', test:d=>true},
+    {label:'関与なし失点（PPG）', test:d=>d.noFault},
+    {label:'特殊局面失点（PP・PK・退場局面・2-0カウンター）', test:d=>d.special,
+     breakdown:rows=>{
+       const pp = rows.filter(d=>d.cat==='PP').length;
+       const pk = rows.filter(d=>d.cat==='PK').length;
+       const taijo = rows.filter(d=>d.detail==='退場局面').length;
+       const nc = rows.filter(d=>d.detail && d.detail.includes('2-0')).length;
+       return `PP:${pp}・PK:${pk}・退場:${taijo}・2-0:${nc}`;
+     }}
+  ];
+  let html = `<tr><th>指標</th>${players.map(p=>`<th class="num">${p}（${MATCH_COUNT[p]}試合）</th>`).join('')}</tr>`;
+  metrics.forEach(m=>{
+    html += `<tr><td class="metric">${m.label}</td>`;
+    players.forEach(p=>{
+      const total = DATA.filter(d=>d.player===p).length;
+      const matchingRows = DATA.filter(d=>d.player===p && m.test(d));
+      const count = matchingRows.length;
+      const rate = (count/MATCH_COUNT[p]).toFixed(2);
+      const share = total ? (count/total*100).toFixed(1) : '0.0';
+      const breakdownLine = m.breakdown ? `<div class="sub">（${m.breakdown(matchingRows)}）</div>` : '';
+      html += `<td class="num"><div class="rate">${count}件</div><div class="sub">${rate}件/試合　全体の${share}%</div>${breakdownLine}</td>`;
     });
+    html += `</tr>`;
+  });
+  document.getElementById('compareTable').innerHTML = html;
+}
+
+function halfStats(player, half){
+  const rows = DATA.filter(d=>d.player===player && d.half===half);
+  const special = rows.filter(d=>d.special).length;
+  const normal = rows.length - special;
+  const m = MATCH_COUNT[player];
+  return { count:rows.length, special, normal, rate:rows.length/m, specialRate:special/m, normalRate:normal/m };
+}
+
+function renderHalfCompare(){
+  const halves = [['前','前半'],['後','後半']];
+  const players = ['西','橋野'];
+  const allStats = {};
+  halves.forEach(([h])=>{ allStats[h]={}; players.forEach(p=>{ allStats[h][p]=halfStats(p,h); }); });
+  const maxRate = Math.max(...halves.flatMap(([h])=>players.map(p=>allStats[h][p].rate)), 0.1);
+
+  const el = document.getElementById('halfCompare');
+  el.innerHTML = halves.map(([h,label])=>{
+    const rows = players.map(p=>{
+      const s = allStats[h][p];
+      const normalPct = (s.normalRate/maxRate*100);
+      const specialPct = (s.specialRate/maxRate*100);
+      return `
+        <div class="barrow">
+          <div class="pname">${p}</div>
+          <div class="bartrack">
+            <div class="seg-normal" style="width:${normalPct}%"></div>
+            <div class="seg-special" style="width:${specialPct}%"></div>
+          </div>
+          <div class="barval">${s.rate.toFixed(2)}件/試合（特殊${s.specialRate.toFixed(2)}・通常${s.normalRate.toFixed(2)}）</div>
+        </div>`;
+    }).join('');
+    return `<div class="halfblock"><div class="htitle">${label}</div>${rows}</div>`;
+  }).join('');
+
+  const nishiBack = allStats['後']['西'];
+  const hashinoBack = allStats['後']['橋野'];
+  const nishiSpecialShare = nishiBack.count ? (nishiBack.special/nishiBack.count*100) : 0;
+  const hashinoSpecialShare = hashinoBack.count ? (hashinoBack.special/hashinoBack.count*100) : 0;
+  document.getElementById('verdictText').innerHTML =
+    `西：後半<b>${nishiBack.rate.toFixed(2)}件/試合</b>（特殊局面${nishiBack.specialRate.toFixed(2)}件/試合＝${nishiSpecialShare.toFixed(0)}%、通常局面${nishiBack.normalRate.toFixed(2)}件/試合）。` +
+    `橋野：後半<b>${hashinoBack.rate.toFixed(2)}件/試合</b>（特殊局面${hashinoBack.specialRate.toFixed(2)}件/試合＝${hashinoSpecialShare.toFixed(0)}%、通常局面${hashinoBack.normalRate.toFixed(2)}件/試合）。`;
+}
+
+function renderHpFilterChips(){
+  const el = document.getElementById('hpFilterGroup');
+  el.innerHTML = '';
+  [[false,'全体失点'],[true,'関与なし失点（PPG）を除く']].forEach(([val,label])=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip'+(state.hpExcludeNoFault===val?' active':'');
+    chip.textContent = label;
+    chip.addEventListener('click', ()=>{ state.hpExcludeNoFault = val; renderHalfPlayerTable(); });
+    el.appendChild(chip);
+  });
+}
+
+function renderHalfPlayerTable(){
+  renderHpFilterChips();
+  const baseData = state.hpExcludeNoFault ? DATA.filter(d=>!d.noFault) : DATA;
+  const groups = ['西','橋野','全体'];
+  const groupRows = {
+    '西': baseData.filter(d=>d.player==='西'),
+    '橋野': baseData.filter(d=>d.player==='橋野'),
+    '全体': baseData
+  };
+  const groupMatches = { '西':MATCH_COUNT['西'], '橋野':MATCH_COUNT['橋野'], '全体': new Set(DATA.map(d=>d.sec)).size };
+  const bands = [
+    {label:'前半 0〜10分', test:d=>d.half==='前' && d.min<10},
+    {label:'前半 10〜20分',test:d=>d.half==='前' && d.min>=10},
+    {label:'後半 0〜10分', test:d=>d.half==='後' && d.min<10},
+    {label:'後半 10〜20分',test:d=>d.half==='後' && d.min>=10}
+  ];
+  let html = `<tr><th>時間帯</th>${groups.map(g=>`<th class="num">${g}（${groupMatches[g]}試合）</th>`).join('')}</tr>`;
+  bands.forEach(b=>{
+    html += `<tr><td class="metric">${b.label}</td>`;
+    groups.forEach(g=>{
+      const rows = groupRows[g];
+      const total = rows.length;
+      const count = rows.filter(b.test).length;
+      const rate = (count/groupMatches[g]).toFixed(2);
+      const share = total ? (count/total*100).toFixed(1) : '0.0';
+      html += `<td class="num"><div class="rate">${count}件</div><div class="sub">${rate}件/試合　全体の${share}%</div></td>`;
+    });
+    html += `</tr>`;
+  });
+  document.getElementById('halfPlayerTable').innerHTML = html;
+}
+
+
+function renderScoreboard(scoped){
+  const totalGoals = scoped.length;
+  const totalMatches = new Set(scoped.map(d=>d.sec)).size;
+  const avg = totalMatches ? (totalGoals/totalMatches).toFixed(1) : '0.0';
+  const catCounts = {};
+  Object.keys(CATS).forEach(c=>catCounts[c]=0);
+  scoped.forEach(d=>catCounts[d.cat]++);
+  const sorted = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]);
+  const topCat = sorted[0];
+  document.getElementById('scoreboard').innerHTML = `
+    <div class="cell"><div class="num">${totalMatches}</div><div class="label">試合数</div></div>
+    <div class="cell"><div class="num">${totalGoals}</div><div class="label">失点数</div></div>
+    <div class="cell"><div class="num">${avg}<span>/試合</span></div><div class="label">平均失点</div></div>
+    <div class="cell hot"><div class="num">${topCat?topCat[1]:0}<span>件</span></div><div class="label">最多カテゴリ：${topCat?topCat[0]:'-'}</div></div>
+  `;
+  return catCounts;
+}
+
+function renderBands(scoped){
+  const bandsEl = document.getElementById('bands');
+  const total = scoped.length;
+  const defs = [
+    {label:'前半 0〜10分', test:d=>d.half==='前' && d.min<10},
+    {label:'前半 10〜20分',test:d=>d.half==='前' && d.min>=10},
+    {label:'後半 0〜10分', test:d=>d.half==='後' && d.min<10},
+    {label:'後半 10〜20分',test:d=>d.half==='後' && d.min>=10}
+  ];
+  bandsEl.innerHTML = defs.map(b=>{
+    const count = scoped.filter(b.test).length;
+    const pct = total ? (count/total*100) : 0;
+    return `
+      <div class="band-cell">
+        <div class="blabel">${b.label}</div>
+        <div class="bcount">${count}<span>件</span></div>
+        <div class="bpct">${pct.toFixed(1)}%</div>
+        <div class="band-bar"><div class="band-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderCatbars(catCounts){
+  const catbarsEl = document.getElementById('catbars');
+  catbarsEl.innerHTML='';
+  const maxCount = Math.max(1, ...Object.values(catCounts));
+  Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).forEach(([cat,count])=>{
+    const row = document.createElement('div');
+    row.className='catbar-row'+(state.cats.has(cat)?'':' off');
+    row.dataset.cat = cat;
+    row.innerHTML = `
+      <div class="dot" style="background:${CATS[cat].color}"></div>
+      <div class="name">${cat}</div>
+      <div class="catbar-track"><div class="catbar-fill" style="width:${count/maxCount*100}%;background:${CATS[cat].color}"></div></div>
+      <div class="count">${count}件</div>
+    `;
+    row.addEventListener('click', ()=>{
+      if(state.cats.has(cat)) state.cats.delete(cat); else state.cats.add(cat);
+      renderAll();
+    });
+    catbarsEl.appendChild(row);
+  });
+}
+
+function renderChips(){
+  const filtersEl = document.getElementById('filters');
+  filtersEl.innerHTML='';
+  [['all','すべて'],['前','前半'],['後','後半']].forEach(([val,label])=>{
+    const chip=document.createElement('div');
+    chip.className='chip'+(state.half===val?' active':'');
+    chip.textContent=label;
+    chip.addEventListener('click',()=>{state.half=val; renderAll();});
+    filtersEl.appendChild(chip);
+  });
+  const search=document.createElement('input');
+  search.className='searchbox';
+  search.placeholder='相手・詳細で検索';
+  search.value=state.q;
+  search.addEventListener('input',e=>{state.q=e.target.value; renderAll();});
+  filtersEl.appendChild(search);
+}
+
+function showTooltip(e, events){
+  const tt = document.getElementById('ganttTooltip');
+  tt.innerHTML = events.map(d=>
+    `<div class="tt-title">第${d.sec}節 ${d.opp}　${d.half}${d.t}</div><div class="tt-sub">${d.cat}${d.detail?' ／ '+d.detail:''}</div>`
+  ).join('<hr>');
+  tt.classList.add('show');
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  const tt = document.getElementById('ganttTooltip');
+  const pad = 14;
+  const rect = tt.getBoundingClientRect();
+  let x = e.clientX + pad;
+  let y = e.clientY + pad;
+  if(x + rect.width > window.innerWidth - 10) x = e.clientX - rect.width - pad;
+  if(y + rect.height > window.innerHeight - 10) y = e.clientY - rect.height - pad;
+  tt.style.left = x+'px';
+  tt.style.top = y+'px';
+}
+function hideTooltip(){
+  document.getElementById('ganttTooltip').classList.remove('show');
+}
+function highlightRow(containerId, rowIdx, on){
+  document.querySelectorAll(`#${containerId} [data-row="${rowIdx}"]`).forEach(elm=>{
+    elm.classList.toggle('row-hover', on);
+  });
+}
+
+function buildTimeline(containerId, half, scopedSet){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+
+  const visibleOpponents = OPPONENTS.filter(opp => scopedSet.some(d=>d.opp===opp));
+
+  const corner = document.createElement('div');
+  corner.className = 'g-head';
+  el.appendChild(corner);
+  for(let m=0;m<20;m++){
+    const h = document.createElement('div');
+    h.className = 'g-head'+(m<5?' zone-early':'')+(m>=15?' zone-late':'');
+    h.textContent = m;
+    el.appendChild(h);
+  }
+
+  visibleOpponents.forEach((opp,rowIdx)=>{
+    const player = DATA.find(d=>d.opp===opp).player;
+    const label = document.createElement('div');
+    label.className = 'g-rowlabel';
+    label.dataset.row = rowIdx;
+    label.innerHTML = `${opp}<span class="gk-tag">${player}</span>`;
+    label.addEventListener('mouseenter', ()=>highlightRow(containerId,rowIdx,true));
+    label.addEventListener('mouseleave', ()=>highlightRow(containerId,rowIdx,false));
+    el.appendChild(label);
+
+    for(let m=0;m<20;m++){
+      const cellEvents = scopedSet.filter(d=>d.opp===opp && d.half===half && Math.floor(d.min)===m);
+      const cell = document.createElement('div');
+      cell.className = 'g-cell'+(m<5?' zone-early':'')+(m>=15?' zone-late':'');
+      cell.dataset.row = rowIdx;
+      if(cellEvents.length){
+        cell.classList.add('filled');
+        if(!cellEvents.some(isOn)) cell.classList.add('dim');
+        const fill = document.createElement('div');
+        fill.className = 'g-fill';
+        fill.style.background = cellEvents.length===1
+          ? CATS[cellEvents[0].cat].color
+          : `linear-gradient(135deg, ${CATS[cellEvents[0].cat].color} 50%, ${CATS[cellEvents[1].cat].color} 50%)`;
+        cell.appendChild(fill);
+        cell.addEventListener('mouseenter', e=>showTooltip(e, cellEvents));
+        cell.addEventListener('mousemove', moveTooltip);
+        cell.addEventListener('mouseleave', hideTooltip);
+      }
+      cell.addEventListener('mouseenter', ()=>highlightRow(containerId,rowIdx,true));
+      cell.addEventListener('mouseleave', ()=>highlightRow(containerId,rowIdx,false));
+      el.appendChild(cell);
+    }
   });
 
-  const form = document.getElementById('contactForm');
-  const thanks = document.getElementById('formThanks');
-  const submitBtn = document.getElementById('formSubmitBtn');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      submitBtn.textContent = '送信中...';
-      submitBtn.disabled = true;
-      const data = new FormData(form);
-      try {
-        const res = await fetch('https://formspree.io/f/mjglpeqk', {
-          method: 'POST', body: data, headers: { 'Accept': 'application/json' }
-        });
-        if (res.ok) {
-          form.style.transition = 'opacity 0.5s ease';
-          form.style.opacity = '0';
-          setTimeout(() => {
-            form.style.display = 'none';
-            document.querySelector('.contact-divider').style.display = 'none';
-            document.querySelector('.line-btn').style.display = 'none';
-            thanks.style.display = 'block';
-            requestAnimationFrame(() => requestAnimationFrame(() => { thanks.style.opacity = '1'; }));
-          }, 500);
-        } else {
-          submitBtn.textContent = '送信に失敗しました。再度お試しください。';
-          submitBtn.disabled = false;
-        }
-      } catch {
-        submitBtn.textContent = '送信に失敗しました。再度お試しください。';
-        submitBtn.disabled = false;
-      }
-    });
+  if(visibleOpponents.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'g-empty-note';
+    empty.textContent = '該当する試合がありません';
+    el.appendChild(empty);
   }
+}
+
+function buildLog(scoped){
+  const logEl = document.getElementById('log');
+  logEl.innerHTML='';
+  const bySec = {};
+  scoped.forEach(d=>{ (bySec[d.sec] ||= []).push(d); });
+  Object.keys(bySec).sort((a,b)=>a-b).forEach(sec=>{
+    const rows = bySec[sec];
+    const visibleRows = rows.filter(isOn);
+    const group = document.createElement('div');
+    group.className='match-group';
+    const head = document.createElement('div');
+    head.className='match-head';
+    head.innerHTML = `<span class="sec">第${sec}節</span><span class="opp">${rows[0].opp}</span><span class="gk">GK:${rows[0].player}</span><span class="cnt">${visibleRows.length}/${rows.length}件表示</span>`;
+    group.appendChild(head);
+    if(visibleRows.length===0){
+      const note=document.createElement('div');
+      note.className='empty-note';
+      note.textContent='該当する失点なし';
+      group.appendChild(note);
+    } else {
+      rows.forEach(d=>{
+        const row=document.createElement('div');
+        row.className='incident'+(isOn(d)?'':' hidden');
+        row.innerHTML = `
+          <span class="half">${d.half}半</span>
+          <span class="time">${d.t}</span>
+          <span class="tag" style="background:${CATS[d.cat].color}22;color:${CATS[d.cat].color}">${d.cat}</span>
+          <span class="detail">${d.detail||'—'}</span>
+        `;
+        group.appendChild(row);
+      });
+    }
+    logEl.appendChild(group);
+  });
+}
+
+function renderAll(){
+  const scoped = DATA.filter(inScope);
+  renderScopeControls();
+  const catCounts = renderScoreboard(scoped);
+  renderBands(scoped);
+  renderCatbars(catCounts);
+  renderChips();
+  buildTimeline('tl-front','前', scoped);
+  buildTimeline('tl-back','後', scoped);
+  buildLog(scoped);
+}
+
+renderExecSummary();
+renderTrendChart();
+renderCompareTable();
+renderHalfPlayerTable();
+renderHalfCompare();
+renderAll();
 </script>
 </body>
 </html>
